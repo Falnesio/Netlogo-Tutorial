@@ -8,9 +8,23 @@ to setup
 end
 
 to go
+  if count turtles = 0 [ stop ]
   move-turtles
   eat-fluff
+  death
+  reproduce
+  poop
+  fluff-regrow
   tick
+end
+
+to reproduce
+  ask turtles [
+    if energy > 50 [
+      set energy energy - offspring-power
+      hatch random 2 [set energy offspring-power]
+    ]
+  ]
 end
 
 to move-turtles
@@ -18,7 +32,7 @@ to move-turtles
     right random 60
     left random 60
     forward 1
-    set energy energy - 1
+    set energy energy - tiredness
   ]
 end
 
@@ -32,6 +46,7 @@ to setup-turtles
   create-turtles 100 [
     setxy random-xcor random-ycor
     set color white
+    set energy 30
     ]
 end
 
@@ -50,7 +65,53 @@ to eat-fluff
       set energy energy + good-patch
     ]
     set color scale-color green energy 200 -100
+    ifelse show-energy?
+    [set label energy]
+    [set label ""]
   ]
+end
+
+to death
+  ask turtles [
+    if energy < 0 [
+      die
+    ]
+  ]
+end
+
+to poop
+  ask turtles [
+     if random 100 > poop-fertility * 10 [
+        if pcolor = blue + 11 [
+          set pcolor blue + 10
+          set energy energy - poop-fertility
+        ]
+        if pcolor = blue + 12 [
+          set pcolor blue + 11
+          set energy energy - poop-fertility
+        ]
+        if pcolor = brown [
+          set pcolor blue + 12
+          set energy energy - poop-fertility
+        ]
+      ]
+    ]
+end
+
+to fluff-regrow
+  ask patches [
+    if random 100 < fluff-fertility [
+        if pcolor = blue + 11 [
+          set pcolor blue + 10
+        ]
+        if pcolor = blue + 12 [
+          set pcolor blue + 11
+        ]
+        if pcolor = brown [
+          set pcolor blue + 12
+        ]
+      ]
+    ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -81,9 +142,9 @@ ticks
 30.0
 
 BUTTON
-9
+7
 10
-72
+70
 43
 NIL
 setup
@@ -98,9 +159,9 @@ NIL
 1
 
 BUTTON
-81
+77
 10
-144
+140
 43
 NIL
 go
@@ -115,25 +176,25 @@ NIL
 0
 
 SLIDER
-9
-78
-181
-111
+6
+167
+178
+200
 bad-patch
 bad-patch
 0
 50
-15.0
+14.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-10
-124
-182
-157
+5
+203
+177
+236
 medium-patch
 medium-patch
 0
@@ -145,10 +206,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-10
-171
-182
-204
+6
+238
+178
+271
 good-patch
 good-patch
 0
@@ -160,10 +221,10 @@ NIL
 HORIZONTAL
 
 PLOT
-5
-224
-205
-374
+6
+274
+206
+424
 plot 1
 NIL
 NIL
@@ -179,6 +240,78 @@ PENS
 "pen-1" 1.0 0 -6917194 true "" "plot count patches with [pcolor = blue + 11]"
 "pen-2" 1.0 0 -5204280 true "" "plot count patches with [pcolor = blue + 12]"
 "pen-3" 1.0 0 -6459832 true "" "plot count patches with [pcolor = brown]"
+"pen-4" 1.0 0 -5298144 true "" "plot count turtles * 10"
+
+SLIDER
+6
+131
+178
+164
+tiredness
+tiredness
+1
+100
+3.0
+1
+1
+NIL
+HORIZONTAL
+
+SWITCH
+16
+426
+150
+459
+show-energy?
+show-energy?
+1
+1
+-1000
+
+SLIDER
+7
+95
+99
+128
+poop-fertility
+poop-fertility
+0
+10
+8.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+6
+60
+178
+93
+offspring-power
+offspring-power
+0
+100
+30.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+103
+95
+195
+128
+fluff-fertility
+fluff-fertility
+0
+100
+9.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
